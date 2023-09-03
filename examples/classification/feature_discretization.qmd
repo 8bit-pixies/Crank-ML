@@ -1,0 +1,131 @@
+---
+title: Feature Discretization
+jupyter: python3
+format: gfm
+---
+
+A demonstration of feature discretization on synthetic classification datasets. Feature discretization decomposes each feature into a set of bins, here equally distributed in width. The discrete values are then one-hot encoded, and given to a linear classifier. This preprocessing enables a non-linear behavior even though the classifier is linear.
+
+```{python}
+import lightning.pytorch as pl
+import torch
+import torch.nn.functional as F
+from sklearn.datasets import make_circles, make_classification, make_moons
+from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader, TensorDataset
+from torchmetrics.functional import accuracy
+
+from crank_ml.linear_model.sgd_classifier import SGDClassifier
+from crank_ml.preprocessing.kbins_discretizer import KBinsDiscretizer
+
+
+class SimpleClassifier(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.model = SGDClassifier(2, n_classes=2)
+
+    def forward(self, X):
+        return self.model(X)
+
+    def training_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"train_acc": acc, "train_loss": loss}
+        self.log_dict(metrics)
+        loss = loss + self.model.penalty()
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"val_acc": acc, "val_loss": loss}
+        self.log_dict(metrics)
+        return metrics
+
+    def test_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"test_acc": acc, "test_loss": loss}
+        self.log_dict(metrics)
+        return metrics
+
+    def _shared_eval_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.forward(x)
+        loss_fn = torch.nn.BCELoss()
+        loss = loss_fn(y_hat, y)
+        acc = torch.mean((torch.argmax(y_hat, axis=1) == y).float())
+        return loss, acc
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.02)
+
+
+class DiscretizedClassifier(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.kbins = KBinsDiscretizer(n_features=2, encode="onehot-flatten")
+        self.model = SGDClassifier(self.kbins.get_output_shape(), n_classes=2)
+
+    def forward(self, X):
+        return self.model(self.kbins(X).float())
+
+    def training_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"train_acc": acc, "train_loss": loss}
+        self.log_dict(metrics)
+        loss = loss + self.model.penalty()
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"val_acc": acc, "val_loss": loss}
+        self.log_dict(metrics)
+        return metrics
+
+    def test_step(self, batch, batch_idx):
+        loss, acc = self._shared_eval_step(batch, batch_idx)
+        metrics = {"test_acc": acc, "test_loss": loss}
+        self.log_dict(metrics)
+        return metrics
+
+    def _shared_eval_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self.forward(x)
+        loss_fn = torch.nn.BCELoss()
+        loss = loss_fn(y_hat, y)
+        acc = torch.mean((torch.round(y_hat) == y).float())
+        return loss, acc
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.02)
+
+
+n_samples = 100
+
+datasets = [
+    make_moons(n_samples=n_samples, noise=0.2, random_state=0),
+    make_circles(n_samples=n_samples, noise=0.2, random_state=0),
+    make_classification(
+        n_samples=n_samples,
+        n_features=2,
+        n_redundant=0,
+        n_informative=2,
+        random_state=2,
+        n_clusters_per_class=1,
+    ),
+]
+
+for X, y in datasets:
+    train_data = DataLoader(
+        TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y.reshape(-1, 1)).float()),
+        batch_size=64,
+    )
+
+    trainer = pl.Trainer(accelerator="cpu", max_epochs=100)
+    model = SimpleClassifier()
+    trainer.fit(model, train_dataloaders=train_data)
+    trainer.test(dataloaders=train_data)
+
+    trainer = pl.Trainer(accelerator="cpu", max_epochs=100)
+    model = DiscretizedClassifier()
+    trainer.fit(model, train_dataloaders=train_data)
+    trainer.test(dataloaders=train_data)
+```
