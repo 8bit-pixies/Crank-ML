@@ -1,4 +1,4 @@
-# :material-progress-wrench: :material-pipe-wrench: Crank ML :material-wrench: :material-hammer-wrench:
+# Crank-ML :material-wrench:
 
 A selection of single-file machine learning recipes for `pytorch`. The provided implementations are intended to be self-contained and reusable in different contexts and problems. The goals of this project is:
 
