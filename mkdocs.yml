@@ -5,7 +5,8 @@ theme:
     logo: material/wrench
   name: material
   features:
-    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
   palette:
     - scheme: default
       primary: indigo
@@ -28,8 +29,18 @@ plugins:
   - search
   - awesome-pages
 markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
   - attr_list
   - md_in_html
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
