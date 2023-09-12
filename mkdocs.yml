@@ -1,3 +1,32 @@
 site_name: Crank ML
 theme:
+  favicon: wrench.png
+  icon:
+    logo: material/wrench
   name: material
+  features:
+    - navigation.tabs
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  nav:
+    - Introduction:
+        - index.md
+    - Getting Started:
+        - introduction/index.md
+plugins:
+  - search
+  - awesome-pages
+markdown_extensions:
+  - attr_list
+  - md_in_html
