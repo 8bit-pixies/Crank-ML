@@ -11,12 +11,10 @@ class FactorizationMachineClassifier(nn.Module):
         penalty="l2",
         alpha=0.0001,
         l1_ratio=0.15,
-        loss="log",
     ):
         super().__init__()
         self.n_features = n_features
         self.embed_dim = embed_dim
-        self.loss = loss
         self.penalty_ = penalty
         self.alpha_ = alpha
         self.l1_ratio_ = l1_ratio

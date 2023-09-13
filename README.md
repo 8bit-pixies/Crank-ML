@@ -8,7 +8,7 @@ A selection of single-file machine learning recipes for `pytorch`. The provided 
 ## Design Principles
 
 - the only dependencies should be pytorch - no other preprocessing library is required when performing _inference_ workflows. All items can be exported to `onnx` by default
-- API naming should follow the broad patterns established in `scikit-learn`, however the actual interfaces will remain as `pytorch`-style inputs/outputs
+- API naming should follow the broad patterns established in `scikit-learn`, however the actual interfaces will remain as `pytorch`-style inputs/outputs. Full model names should be used with the exception of commonly used phrasing (e.g. `PCA`).
 - To support best practises, we will encourage using lightning
 - Parameters which are not differentiable are updated stochastically via polyak averaging (e.g. `KBinsDiscretizer`)
 

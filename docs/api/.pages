@@ -1,4 +1,6 @@
 title: API
 nav:
   - cluster
-
+  - decomposition
+  - factorization_machine
+  - impute

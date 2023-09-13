@@ -1,5 +1,7 @@
 # KMeans
 
+> `crank_ml.cluster.kmeans.KMeans`
+
 The most common way to implement batch k-means is to use Lloyd's algorithm, which consists in assigning all the data points to a set of cluster centers and then moving the centers accordingly.
 
 In this implementation we start by finding the cluster that is closest to the current observation. We then move the cluster's central position towards the new observation. The halflife parameter determines by how much to move the cluster toward the new observation.
