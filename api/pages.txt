@@ -1,0 +1,10 @@
+title: API
+nav:
+  - cluster
+  - decomposition
+  - factorization_machine
+  - impute
+  - linear_model
+  - preprocessing
+  - tabnet
+  - tree
