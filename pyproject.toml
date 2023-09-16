@@ -2,7 +2,7 @@
 name = "crank-ml"
 version = "0.1.0"
 description = ""
-authors = ["chapman73 <csiu@squareup.com>"]
+authors = ["8bit-pixies"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
